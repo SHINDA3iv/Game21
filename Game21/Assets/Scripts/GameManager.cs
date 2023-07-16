@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
         betButton.onClick.AddListener(() => BetClicked());
         hitButton.gameObject.SetActive(false);
         standButton.gameObject.SetActive(false);
-        dealButton.gameObject.SetActive(true);
+        dealButton.gameObject.SetActive(false);
         dealerScoreText.gameObject.SetActive(false);
     }
 
@@ -71,11 +71,9 @@ public class GameManager : MonoBehaviour
         standButton.gameObject.SetActive(true);
         standButtonText.text = "Хватит";
 
-        // Set standard pot size
-        pot = 50;
-        betText.text = "Ставка: " + pot.ToString();
-        playerScript.AdjustMoney(-25);
-        chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
+        betButton.gameObject.SetActive(false);
+
+        if (playerScript.handValue == 21 || dealerScript.handValue == 21) RoundOver();
     }
 
     private void HitClicked()
@@ -153,11 +151,14 @@ public class GameManager : MonoBehaviour
         {
             hitButton.gameObject.SetActive(false);
             standButton.gameObject.SetActive(false);
-            dealButton.gameObject.SetActive(true);
+            dealButton.gameObject.SetActive(false);
             mainText.gameObject.SetActive(true);
+            betButton.gameObject.SetActive(true);
             dealerScoreText.gameObject.SetActive(true);
             hideCard.GetComponent<Renderer>().enabled = false;
             chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
+            pot = 0;
+            betText.text = "Ставка: " + pot.ToString();
             standClicks = 0;
         }
     }
@@ -167,9 +168,13 @@ public class GameManager : MonoBehaviour
     {
         Text newBet = betButton.GetComponentInChildren(typeof(Text)) as Text;
         int intBet = int.Parse(newBet.text.ToString());
-        playerScript.AdjustMoney(-intBet);
-        chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
-        pot += (intBet * 2);
-        betText.text = "Ставка: " + pot.ToString();
+        if (playerScript.GetMoney() >= intBet)
+        {
+            dealButton.gameObject.SetActive(true);
+            playerScript.AdjustMoney(-intBet);
+            chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
+            pot += (intBet * 2);
+            betText.text = "Ставка: " + pot.ToString();
+        }
     }
 }
