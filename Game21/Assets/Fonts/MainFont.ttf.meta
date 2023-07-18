@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: aadd27bcbf44d544f910e3ea65deaf97
+guid: 8f03576d06aa2fe41b9b92cde0b9d746
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -10,8 +10,7 @@ TrueTypeFontImporter:
   includeFontData: 1
   fontNames:
   - a_MachinaOrtoGr
-  fallbackFontReferences:
-  - {fileID: 12800000, guid: 8f03576d06aa2fe41b9b92cde0b9d746, type: 3}
+  fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
