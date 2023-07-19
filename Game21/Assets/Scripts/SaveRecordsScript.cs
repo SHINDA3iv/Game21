@@ -1,32 +1,73 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class SaveRecordsScript : MonoBehaviour
 {
-    public static void SaveScore(int score ) {
-        PlayerPrefs.SetInt("highscoreTable", score );
-        PlayerPrefs.Save();
-    }
- 
-    public static int LoadScore() {
-        if( !PlayerPrefs.HasKey("highscoreTable") )
-            return 0;
-        return PlayerPrefs.GetInt("highscoreTable", 0 );
-    }
-};
+    private string scoresFilePath;
 
-public class Example : MonoBehaviour
-{
     void Start()
     {
-        var score = SaveRecordsScript.LoadScore();
-        Debug.Log(string.Format("Количество очков равняется: {0}!", score));
-
-        score += 1000; // изменяем количество сохранённых очков
-
-        SaveRecordsScript.SaveScore(score); // сохраняем новые данные
-
+        scoresFilePath = Application.dataPath + "/scores.txt";
+        // Проверяем, существует ли файл
+        if (!File.Exists(scoresFilePath))
+        {
+            // Если файл не существует, создаем его
+            File.Create(scoresFilePath).Dispose();
+        }
     }
 
+    public void WriteNewScore(int score)
+    {
+        // Получаем список всех рекордов из файла
+        List<ScoreData> scores = ReadScoresFromFile();
+
+        // Добавляем новый рекорд
+        scores.Add(new ScoreData(score));
+
+        // Сортируем рекорды по убыванию
+        scores = scores.OrderByDescending(s => s.score).ToList();
+
+        // Если количество рекордов превышает 10, удаляем лишние
+        if (scores.Count > 10)
+        {
+            scores = scores.Take(10).ToList();
+        }
+
+        // Записываем отсортированные рекорды обратно в файл
+        WriteScoresToFile(scores);
+    }
+
+    public List<ScoreData> ReadScoresFromFile()
+    {
+        List<ScoreData> scores = new List<ScoreData>();
+        scoresFilePath = Application.dataPath + "/scores.txt";
+
+        string[] lines = File.ReadAllLines(scoresFilePath);
+
+        foreach (string line in lines)
+        {
+            int score = int.Parse(line);
+            scores.Add(new ScoreData(score));
+        }
+
+        return scores;
+    }
+
+    void WriteScoresToFile(List<ScoreData> scores)
+    {
+        // Перезаписываем файл с рекордами
+        File.WriteAllText(scoresFilePath, string.Empty);
+
+        using (StreamWriter writer = new StreamWriter(scoresFilePath, true))
+        {
+            for (int i = 0; i < scores.Count; i++)
+            {
+                // Записываем рекорд в файл
+                writer.WriteLine(scores[i].score);
+            }
+        }
+    }
 }

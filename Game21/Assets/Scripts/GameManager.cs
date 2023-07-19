@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
+using System.IO;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
-{
+{   
     public Button dealButton;
     public Button repeatButton;
     public Button hitButton;
@@ -14,15 +15,14 @@ public class GameManager : MonoBehaviour
     public Button bet50Button;
     public Button bet100Button;
     public Button popupMenuButton;
-    public Button backButton; 
+    public Button backButton;
     public Button menuButton;
-
 
     private int standClicks = 0;
 
     public PlayerScript playerScript;
     public PlayerScript dealerScript;
-    public SaveRecordsScript SaveRecordsScript;
+    public SaveRecordsScript saveRecordsScript;
 
     public Text scoreText;
     public Text dealerScoreText;
@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour
         // Adjust buttons visibility
         dealButton.gameObject.SetActive(false);
         hitButton.gameObject.SetActive(true);
-        standButton.gameObject.SetActive(true); 
+        standButton.gameObject.SetActive(true);
         standButtonText.text = "Хватит";
 
         bet50Button.gameObject.SetActive(false);
@@ -279,6 +279,6 @@ public class GameManager : MonoBehaviour
 
     public void MenuClicked()
     {
-        SaveRecordsScript.SaveScore(playerScript.GetMoney());
+        saveRecordsScript.WriteNewScore(playerScript.GetMoney());
     }
 }

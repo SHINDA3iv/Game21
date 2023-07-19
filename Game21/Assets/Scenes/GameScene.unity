@@ -5703,7 +5703,7 @@ MonoBehaviour:
   menuButton: {fileID: 979073729}
   playerScript: {fileID: 826267109}
   dealerScript: {fileID: 1742645530}
-  SaveRecordsScript: {fileID: 455423344}
+  saveRecordsScript: {fileID: 455423344}
   scoreText: {fileID: 1945503336}
   dealerScoreText: {fileID: 707316240}
   betText: {fileID: 453490047}
