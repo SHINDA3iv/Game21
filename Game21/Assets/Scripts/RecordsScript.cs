@@ -65,10 +65,14 @@ public class RecordsScript : MonoBehaviour
         int score = ScoreData.score;
         entryTransform.Find("scoreText").GetComponent<Text>().text = score.ToString();
 
+        string name = ScoreData.playerName;
+        entryTransform.Find("nameText").GetComponent<Text>().text = name.ToString();
+
         if (rank == 1)
         {
             entryTransform.Find("posText").GetComponent<Text>().color = Color.green;
             entryTransform.Find("scoreText").GetComponent<Text>().color = Color.green;
+            entryTransform.Find("nameText").GetComponent<Text>().color = Color.green;
         }
 
         if (rank % 2 != 1)

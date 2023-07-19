@@ -12,11 +12,13 @@ public class GameManager : MonoBehaviour
     public Button repeatButton;
     public Button hitButton;
     public Button standButton;
-    public Button bet50Button;
     public Button bet100Button;
+    public Button bet250Button;
+    public Button bet500Button;
     public Button popupMenuButton;
     public Button backButton;
     public Button menuButton;
+    public Button gameoverButton;
 
     private int standClicks = 0;
 
@@ -46,11 +48,13 @@ public class GameManager : MonoBehaviour
         repeatButton.onClick.AddListener(() => RepeatClicked());
         hitButton.onClick.AddListener(() => HitClicked());
         standButton.onClick.AddListener(() => StandClicked());
-        bet50Button.onClick.AddListener(() => BetClicked(bet50Button));
         bet100Button.onClick.AddListener(() => BetClicked(bet100Button));
+        bet250Button.onClick.AddListener(() => BetClicked(bet250Button));
+        bet500Button.onClick.AddListener(() => BetClicked(bet500Button));
         popupMenuButton.onClick.AddListener(() => popupClicked());
         backButton.onClick.AddListener(() => BackClicked());
         menuButton.onClick.AddListener(() => MenuClicked());
+        gameoverButton.onClick.AddListener(() => MenuClicked());
 
         hitButton.gameObject.SetActive(false);
         standButton.gameObject.SetActive(false);
@@ -60,6 +64,7 @@ public class GameManager : MonoBehaviour
         hideCard.gameObject.SetActive(false);
         popupMenu.gameObject.SetActive(false);
         HidePanel.gameObject.SetActive(false);
+        gameoverButton.gameObject.SetActive(false);
 
         playerScript.ResetHand();
         dealerScript.ResetHand();
@@ -91,16 +96,18 @@ public class GameManager : MonoBehaviour
         standButton.gameObject.SetActive(true);
         standButtonText.text = "Хватит";
 
-        bet50Button.gameObject.SetActive(false);
         bet100Button.gameObject.SetActive(false);
+        bet250Button.gameObject.SetActive(false);
+        bet500Button.gameObject.SetActive(false);
 
         if (playerScript.handValue == 21 || dealerScript.handValue == 21) RoundOver();
     }
 
     private void RepeatClicked()
     {
-        bet50Button.gameObject.SetActive(true);
         bet100Button.gameObject.SetActive(true);
+        bet250Button.gameObject.SetActive(true);
+        bet500Button.gameObject.SetActive(true);
         repeatButton.gameObject.SetActive(false);
         mainText.gameObject.SetActive(false);
         dealerScoreText.gameObject.SetActive(false);
@@ -188,24 +195,36 @@ public class GameManager : MonoBehaviour
         {
             roundOver = false;
         }
-
         // Set ui up for next move / hand / turn
         if (roundOver)
         {
             hitButton.gameObject.SetActive(false);
             standButton.gameObject.SetActive(false);
-            dealButton.gameObject.SetActive(false);
             mainText.gameObject.SetActive(true);
-            repeatButton.gameObject.SetActive(true);
             dealerScoreText.gameObject.SetActive(true);
             hideCard.GetComponent<Renderer>().enabled = false;
+
             chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
             bankText.text = "Банк дилера: " + dealerScript.GetMoney().ToString();
-            PlayerPrefs.SetInt("highscoreTable", playerScript.GetMoney());
+            
             pot = 0;
             betText.text = "Ставка: " + pot.ToString();
             standClicks = 0;
+
+            if (playerScript.GetMoney() == 0 || dealerScript.GetMoney() == 0)
+            {
+                GameOver();
+            }
+            else
+                repeatButton.gameObject.SetActive(true);
         }
+    }
+
+    void GameOver()
+    {
+        gameoverButton.gameObject.SetActive(true);
+        if (playerScript.GetMoney() == 0) mainText.text = "У вас кончились деньги!";
+        else if (dealerScript.GetMoney() == 0) mainText.text = "У дилера кончились деньги!";
     }
 
     // Add money to pot if bet clicked
@@ -216,12 +235,18 @@ public class GameManager : MonoBehaviour
         if (playerScript.GetMoney() >= intBet && dealerScript.GetMoney() >= intBet)
         {
             dealButton.gameObject.SetActive(true);
+            mainText.gameObject.SetActive(false);
             playerScript.AdjustMoney(-intBet);
             dealerScript.AdjustMoney(-intBet);
             chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
             bankText.text = "Банк дилера: " + dealerScript.GetMoney().ToString();
             pot += (intBet * 2);
             betText.text = "Ставка: " + pot.ToString();
+        }
+        else
+        {
+            mainText.gameObject.SetActive(true);
+            mainText.text = "Деньги кончились!";
         }
     }
 
@@ -234,8 +259,10 @@ public class GameManager : MonoBehaviour
         repeatButton.interactable = false;
         hitButton.interactable = false;
         standButton.interactable = false;
-        bet50Button.interactable = false;
+
         bet100Button.interactable = false;
+        bet250Button.interactable = false;
+        bet500Button.interactable = false;
 
         for (int i = 0; i < playerScript.hand.Length; i++)
         {
@@ -260,8 +287,10 @@ public class GameManager : MonoBehaviour
         repeatButton.interactable = true;
         hitButton.interactable = true;
         standButton.interactable = true;
-        bet50Button.interactable = true;
+
         bet100Button.interactable = true;
+        bet250Button.interactable = true;
+        bet500Button.interactable = true;
 
         for (int i = 0; i < playerScript.hand.Length; i++)
         {
@@ -279,6 +308,7 @@ public class GameManager : MonoBehaviour
 
     public void MenuClicked()
     {
-        saveRecordsScript.WriteNewScore(playerScript.GetMoney());
+        if (dealerScript.GetMoney() < playerScript.GetMoney()) saveRecordsScript.WriteNewScore("Вы", playerScript.GetMoney());
+        else if (dealerScript.GetMoney() > playerScript.GetMoney()) saveRecordsScript.WriteNewScore("Дилер", dealerScript.GetMoney());
     }
 }

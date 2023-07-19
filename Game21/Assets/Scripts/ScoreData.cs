@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 public class ScoreData
 {
+    public string playerName;
     public int score;
 
-    public ScoreData(int score)
+    public ScoreData(string name, int score)
     {
+        playerName = name;
         this.score = score;
     }
 }

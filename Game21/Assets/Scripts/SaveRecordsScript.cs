@@ -19,13 +19,13 @@ public class SaveRecordsScript : MonoBehaviour
         }
     }
 
-    public void WriteNewScore(int score)
+    public void WriteNewScore(string playerName, int score)
     {
         // Получаем список всех рекордов из файла
         List<ScoreData> scores = ReadScoresFromFile();
 
         // Добавляем новый рекорд
-        scores.Add(new ScoreData(score));
+        scores.Add(new ScoreData(playerName, score));
 
         // Сортируем рекорды по убыванию
         scores = scores.OrderByDescending(s => s.score).ToList();
@@ -49,8 +49,11 @@ public class SaveRecordsScript : MonoBehaviour
 
         foreach (string line in lines)
         {
-            int score = int.Parse(line);
-            scores.Add(new ScoreData(score));
+            string[] data = line.Split(',');
+            string playerName = data[0];
+            int score = int.Parse(data[1]);
+
+            scores.Add(new ScoreData(playerName, score));
         }
 
         return scores;
@@ -66,7 +69,7 @@ public class SaveRecordsScript : MonoBehaviour
             for (int i = 0; i < scores.Count; i++)
             {
                 // Записываем рекорд в файл
-                writer.WriteLine(scores[i].score);
+                writer.WriteLine(scores[i].playerName + "," + scores[i].score);
             }
         }
     }
