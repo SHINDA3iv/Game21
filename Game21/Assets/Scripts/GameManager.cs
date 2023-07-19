@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
     private void HitClicked()
     {
         // Check that there is still room on the table
-        if (playerScript.cardIndex <= 10)
+        if (playerScript.cardIndex <= 11)
         {
             playerScript.GetCard();
             scoreText.text = "Ваш счет: " + playerScript.handValue.ToString();
@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
         // All bust, bets returned
         if (playerBust && dealerBust)
         {
-            mainText.text = "У всех перебор: ставки возвращены!";
+            mainText.text = "У всех перебор!";
             playerScript.AdjustMoney(pot / 2);
             dealerScript.AdjustMoney(pot / 2);
         }
@@ -187,7 +187,7 @@ public class GameManager : MonoBehaviour
         //Check for tie, return bets
         else if (playerScript.handValue == dealerScript.handValue)
         {
-            mainText.text = "Ничья: ставки возвращены!";
+            mainText.text = "Ничья!";
             playerScript.AdjustMoney(pot / 2);
             dealerScript.AdjustMoney(pot / 2);
         }
@@ -202,7 +202,7 @@ public class GameManager : MonoBehaviour
             standButton.gameObject.SetActive(false);
             mainText.gameObject.SetActive(true);
             dealerScoreText.gameObject.SetActive(true);
-            hideCard.GetComponent<Renderer>().enabled = false;
+            hideCard.gameObject.SetActive(false);
 
             chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
             bankText.text = "Банк дилера: " + dealerScript.GetMoney().ToString();
@@ -267,11 +267,14 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < playerScript.hand.Length; i++)
         {
             var rendererPlayer = playerScript.hand[i].GetComponent<Renderer>();
-            var rendererDealer = dealerScript.hand[i].GetComponent<Renderer>();
             rendererPlayer.material.color *= 0.5f;
+        }
+        for (int i = 0; i < dealerScript.hand.Length; i++)
+        {
+            var rendererDealer = dealerScript.hand[i].GetComponent<Renderer>();
             rendererDealer.material.color *= 0.5f;
         }
-        dealerScript.hand[0].GetComponent<Renderer>().gameObject.SetActive(false);
+        if (hideCard.activeSelf) dealerScript.hand[0].GetComponent<Renderer>().gameObject.SetActive(false);
         var rendererHide = hideCard.GetComponent<Renderer>();
         var rendererDeck = Deck.GetComponent<Renderer>();
         rendererHide.material.color *= 0.5f;
@@ -294,10 +297,13 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < playerScript.hand.Length; i++)
         {
-            var rendererplayer = playerScript.hand[i].GetComponent<Renderer>();
-            var rendererdealer = dealerScript.hand[i].GetComponent<Renderer>();
-            rendererplayer.material.color *= 2f;
-            rendererdealer.material.color *= 2f;
+            var rendererPlayer = playerScript.hand[i].GetComponent<Renderer>();
+            rendererPlayer.material.color *= 2f;
+        }
+        for (int i = 0; i < dealerScript.hand.Length; i++)
+        {
+            var rendererDealer = dealerScript.hand[i].GetComponent<Renderer>();
+            rendererDealer.material.color *= 2f;
         }
         dealerScript.hand[0].GetComponent<Renderer>().gameObject.SetActive(true);
         var rendererHide = hideCard.GetComponent<Renderer>();
