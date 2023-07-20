@@ -1,17 +1,18 @@
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
-using System.IO;
 using UnityEngine.UI;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManager : MonoBehaviour
 {   
+    //Кнопки на сцене
     public Button dealButton;
-    public Button repeatButton;
     public Button hitButton;
     public Button standButton;
+    public Button repeatButton;
     public Button bet100Button;
     public Button bet250Button;
     public Button bet500Button;
@@ -20,12 +21,12 @@ public class GameManager : MonoBehaviour
     public Button menuButton;
     public Button gameoverButton;
 
-    private int standClicks = 0;
-
+    //Подключение скриптов
     public PlayerScript playerScript;
     public PlayerScript dealerScript;
     public SaveRecordsScript saveRecordsScript;
 
+    //Тексты на сцене
     public Text scoreText;
     public Text dealerScoreText;
     public Text betText;
@@ -34,19 +35,20 @@ public class GameManager : MonoBehaviour
     public Text mainText;
     public Text standButtonText;
 
-    // Card hiding dealer's 2nd card
-    public GameObject hideCard;
-    public GameObject popupMenu;
-    public GameObject Deck;
-    // How much is bet
-    int pot = 0;
+    public GameObject hideCard; //Карта скрывабщая карту дилера
+    public GameObject popupMenu; //Всплывающее меню
+    public GameObject Deck; //Колода карт
 
+    int pot = 0; //Величина ставки
+    private int standClicks = 0; //Количество кликов на standButton
+
+    //Настройка UI при начале игры
     void Start()
     {
         dealButton.onClick.AddListener(() => DealClicked());
-        repeatButton.onClick.AddListener(() => RepeatClicked());
         hitButton.onClick.AddListener(() => HitClicked());
         standButton.onClick.AddListener(() => StandClicked());
+        repeatButton.onClick.AddListener(() => RepeatClicked());
         bet100Button.onClick.AddListener(() => BetClicked(bet100Button));
         bet250Button.onClick.AddListener(() => BetClicked(bet250Button));
         bet500Button.onClick.AddListener(() => BetClicked(bet500Button));
@@ -55,29 +57,38 @@ public class GameManager : MonoBehaviour
         menuButton.onClick.AddListener(() => MenuClicked());
         gameoverButton.onClick.AddListener(() => MenuClicked());
 
+        dealButton.gameObject.SetActive(false);
         hitButton.gameObject.SetActive(false);
         standButton.gameObject.SetActive(false);
-        dealButton.gameObject.SetActive(false);
         repeatButton.gameObject.SetActive(false);
-        dealerScoreText.gameObject.SetActive(false);
-        scoreText.gameObject.SetActive(false);
-        hideCard.gameObject.SetActive(false);
-        popupMenu.gameObject.SetActive(false);
         gameoverButton.gameObject.SetActive(false);
 
-        mainText.text = "Сделайте ставку";
+        dealerScoreText.gameObject.SetActive(false);
+        scoreText.gameObject.SetActive(false);
+
+        hideCard.gameObject.SetActive(false);
+        popupMenu.gameObject.SetActive(false);
+
+        mainText.text = "Сделайте ставку!";
 
         playerScript.ResetHand();
         dealerScript.ResetHand();
     }
 
+    //Настройка UI при начале раунда
     private void DealClicked()
     {
-        // Hide deal hand score at start of deal
-        //dealerScoreText.gameObject.SetActive(false);
+        dealButton.gameObject.SetActive(false);
+        hitButton.gameObject.SetActive(true);
+        standButton.gameObject.SetActive(true);
+        bet100Button.gameObject.SetActive(false);
+        bet250Button.gameObject.SetActive(false);
+        bet500Button.gameObject.SetActive(false);
+
         scoreText.gameObject.SetActive(true);
         mainText.gameObject.SetActive(false);
-        //dealerScoreText.gameObject.SetActive(false);
+
+        //Сокрытие карты дилера
         hideCard.gameObject.SetActive(true);
 
         GameObject.Find("Deck").GetComponent<DeckScript>().Shuffle();
@@ -85,34 +96,24 @@ public class GameManager : MonoBehaviour
         playerScript.StartHand();
         dealerScript.StartHand();
 
-        // Update the scores displayed
         scoreText.text = "Ваш счет: " + playerScript.handValue.ToString();
         dealerScoreText.text = "Счет дилера: " + dealerScript.handValue.ToString();
-
-        // Place card back on dealer card, hide card
-        hideCard.GetComponent<Renderer>().enabled = true;
-
-        // Adjust buttons visibility
-        dealButton.gameObject.SetActive(false);
-        hitButton.gameObject.SetActive(true);
-        standButton.gameObject.SetActive(true);
         standButtonText.text = "Хватит";
 
-        bet100Button.gameObject.SetActive(false);
-        bet250Button.gameObject.SetActive(false);
-        bet500Button.gameObject.SetActive(false);
-
+        //Проверка на 21 у игрока и дилера при первом ходе
         if (playerScript.handValue == 21 || dealerScript.handValue == 21) RoundOver();
     }
 
+    //Настройка UI для нового раунда
     private void RepeatClicked()
     {
+        dealerScoreText.gameObject.SetActive(false);
+        mainText.gameObject.SetActive(false);
+
+        repeatButton.gameObject.SetActive(false);
         bet100Button.gameObject.SetActive(true);
         bet250Button.gameObject.SetActive(true);
         bet500Button.gameObject.SetActive(true);
-        repeatButton.gameObject.SetActive(false);
-        mainText.gameObject.SetActive(false);
-        dealerScoreText.gameObject.SetActive(false);
 
         playerScript.ResetHand();
         dealerScript.ResetHand();
@@ -121,9 +122,10 @@ public class GameManager : MonoBehaviour
         dealerScoreText.text = "Счет дилера: " + dealerScript.handValue.ToString();
     }
 
+    //Нажатие на кнопку hitButton
     private void HitClicked()
     {
-        // Check that there is still room on the table
+        //Проверка оставшегося места для карт у игрока
         if (playerScript.cardIndex <= 11)
         {
             playerScript.GetCard();
@@ -132,20 +134,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //Нажатие на кнопку standButton
     private void StandClicked()
     {
+        int hitDealer = dealerScript.cardIndex;
         standClicks++;
-        int tr = dealerScript.cardIndex;
         HitDealer();
         standButtonText.text = "Принять";
-        if (standClicks > 1 && tr == dealerScript.cardIndex)
-        {
-            RoundOver();
-        }
+        //Если кнопка уже была нажата пару раз и дилер не добирал карты, то конец раунда
+        if (standClicks > 1 && hitDealer == dealerScript.cardIndex) RoundOver();
     }
 
+    //Добор карт дилера
     private void HitDealer()
     {
+        //Проверка оставшегося места для карт у игрока, а также на значение карт меньше 17 и  меньше чем у игрока
         while (dealerScript.handValue < 17 && dealerScript.cardIndex < 10 && dealerScript.handValue <= playerScript.handValue)
         {
             dealerScript.GetCard();
@@ -154,39 +157,39 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Проверка на победителя и проигравшего, окончание раздачи
+    //Проверка на победителя и проигравшего, окончание раздачи
     void RoundOver()
     {
-        // Booleans (true/false) for bust and blackjack/21
+        //Переменные для проверки на перебор или 21
         bool playerBust = playerScript.handValue > 21;
         bool dealerBust = dealerScript.handValue > 21;
         bool player21 = playerScript.handValue == 21;
         bool dealer21 = dealerScript.handValue == 21;
 
-        // If stand has been clicked less than twice, no 21s or busts, quit function
+        //Если кнопка Stand была нажата менее двух раз, нет переборов или 21, завершите работу функции
         if (standClicks < 2 && !playerBust && !dealerBust && !player21 && !dealer21) return;
         bool roundOver = true;
 
-        // All bust, bets returned
+        //У всех перебор, возврат ставок
         if (playerBust && dealerBust)
         {
             mainText.text = "У всех перебор!";
             playerScript.AdjustMoney(pot / 2);
             dealerScript.AdjustMoney(pot / 2);
         }
-        // if player busts, dealer didnt, or if dealer has more points, dealer wins
+        //Если только у игрока перебор или у дилера больше очков, дилер выигрывает
         else if (playerBust || (!dealerBust && dealerScript.handValue > playerScript.handValue))
         {
             mainText.text = "Вы проиграли!";
             dealerScript.AdjustMoney(pot);
         }
-        // if dealer busts, player didnt, or player has more points, player wins
+        //Если только у дилера перебор или у игрока больше очков, игрок выигрывает
         else if (dealerBust || playerScript.handValue > dealerScript.handValue)
         {
             mainText.text = "ВЫ победили!";
             playerScript.AdjustMoney(pot);
         }
-        //Check for tie, return bets
+        //Проверка на ничью, возврат ставок
         else if (playerScript.handValue == dealerScript.handValue)
         {
             mainText.text = "Ничья!";
@@ -197,44 +200,46 @@ public class GameManager : MonoBehaviour
         {
             roundOver = false;
         }
-        // Set ui up for next move / hand / turn
+        // Настройка UI для следующего хода/раздачи/очереди/окончания игры
         if (roundOver)
         {
             hitButton.gameObject.SetActive(false);
             standButton.gameObject.SetActive(false);
-            mainText.gameObject.SetActive(true);
+
             dealerScoreText.gameObject.SetActive(true);
+            mainText.gameObject.SetActive(true);
+
             hideCard.gameObject.SetActive(false);
 
             chipsText.text = "Ваш банк: " + playerScript.GetMoney().ToString();
             bankText.text = "Банк дилера: " + dealerScript.GetMoney().ToString();
-            
+
             pot = 0;
             betText.text = "Ставка: " + pot.ToString();
             standClicks = 0;
 
-            if (playerScript.GetMoney() == 0 || dealerScript.GetMoney() == 0)
-            {
-                GameOver();
-            }
-            else
-                repeatButton.gameObject.SetActive(true);
+            //Проверка на окончание игры 
+            if (playerScript.GetMoney() == 0 || dealerScript.GetMoney() == 0) GameOver();
+            else repeatButton.gameObject.SetActive(true);
         }
     }
 
+    //Окончание игры 
     void GameOver()
     {
         gameoverButton.gameObject.SetActive(true);
         if (playerScript.GetMoney() == 0 && dealerScript.GetMoney() == 0) mainText.text = "Деньги кончились!";
     }
 
-    // Add money to pot if bet clicked
+    //Добавление денег в банк при нажатии кнопки bet
     void BetClicked(Button bet)
     {
-        Text newBet = bet.GetComponentInChildren(typeof(Text)) as Text;
-        int intBet = int.Parse(newBet.text.ToString());
         mainText.gameObject.SetActive(false);
 
+        Text newBet = bet.GetComponentInChildren(typeof(Text)) as Text;
+        int intBet = int.Parse(newBet.text.ToString());
+
+        //Проверка на наличие достаточного количества денег у дилера и игрока
         if (playerScript.GetMoney() >= intBet && dealerScript.GetMoney() >= intBet)
         {
             dealButton.gameObject.SetActive(true);
@@ -253,34 +258,39 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //настройка UI при нажатии кнопки для открытия всплывающего меню
     void popupClicked()
     {
-        popupMenu.gameObject.SetActive(true);
         popupMenuButton.gameObject.SetActive(false);
+
+        popupMenu.gameObject.SetActive(true);
+
         dealButton.interactable = false;
         repeatButton.interactable = false;
         hitButton.interactable = false;
         standButton.interactable = false;
-
         bet100Button.interactable = false;
         bet250Button.interactable = false;
         bet500Button.interactable = false;
     }
 
+    //настройка UI при нажатии кнопки для закрытия всплывающего меню
     public void BackClicked()
     {
-        popupMenu.gameObject.SetActive(false);
         popupMenuButton.gameObject.SetActive(true);
+
+        popupMenu.gameObject.SetActive(false);
+
         dealButton.interactable = true;
         repeatButton.interactable = true;
         hitButton.interactable = true;
         standButton.interactable = true;
-
         bet100Button.interactable = true;
         bet250Button.interactable = true;
         bet500Button.interactable = true;
     }
 
+    //Сохранение результатов для передачи лучших из них в таблицу рекордов при нажатии кнопки выхода в меню
     public void MenuClicked()
     {
         if (dealerScript.GetMoney() < playerScript.GetMoney()) saveRecordsScript.WriteNewScore("Вы", playerScript.GetMoney());

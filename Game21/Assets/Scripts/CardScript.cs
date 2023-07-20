@@ -5,29 +5,28 @@ using UnityEngine;
 
 public class CardScript : MonoBehaviour
 {
-    // Value of card, 2 of clubs = 2, etc
+    //Значение карты
     public int value = 0;
 
+    //Возвращает значение карты
     public int GetValueOfCard()
     {
         return value;
     }
 
+    //Назначает значение карты
     public void SetValue(int newValue)
     {
         value = newValue;
     }
 
-    public string GetSpriteName()
-    {
-        return GetComponent<SpriteRenderer>().sprite.name;
-    }
-
+    //Назначает спрайт карты
     public void SetSprite(Sprite newSprite)
     {
         gameObject.GetComponent<SpriteRenderer>().sprite = newSprite;
     }
 
+    //Скрывает карты
     public void ResetCard()
     {
         Sprite back = GameObject.Find("Deck").GetComponent<DeckScript>().GetCardBack();

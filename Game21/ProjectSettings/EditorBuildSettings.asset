@@ -10,11 +10,14 @@ EditorBuildSettings:
     guid: 92159c16d32b9e84da9429611c243394
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    guid: b4aacc694135d4142b9ee7ff5de9de68
   - enabled: 1
     path: Assets/Scenes/RulesScene.unity
-    guid: 7566e8d7a0a1e2d40b8b38bde49e1513
+    guid: 63ccd444a5e042e418c3c0de1a0109d2
   - enabled: 1
     path: Assets/Scenes/RecordsScene.unity
     guid: e7842345cf1a39d4991eac0dbc01f76e
+  - enabled: 1
+    path: Assets/Scenes/StudyScene.unity
+    guid: 7566e8d7a0a1e2d40b8b38bde49e1513
   m_configObjects: {}

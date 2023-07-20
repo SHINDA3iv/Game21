@@ -14,6 +14,7 @@ public class DeckScript : MonoBehaviour
         GetCardValues();
     }
 
+    //Дает картам колоды значения
     void GetCardValues()
     {
         cardValues[0] = 0;
@@ -38,6 +39,7 @@ public class DeckScript : MonoBehaviour
         }
     }
 
+    //Перетасовка колоды
     public void Shuffle()
     {
         // Standard array data swapping technique
@@ -55,6 +57,7 @@ public class DeckScript : MonoBehaviour
         currentIndex = 1;
     }
 
+    //Назначает карту из колоды
     public int DealCard(CardScript cardScript)
     {
         cardScript.SetSprite(cardSprites[currentIndex]);
@@ -63,6 +66,7 @@ public class DeckScript : MonoBehaviour
         return cardScript.GetValueOfCard();
     }
 
+    //Возвращает спрайт обратной стороны карт
     public Sprite GetCardBack()
     {
         return cardSprites[0];

@@ -10,6 +10,7 @@ public class SaveRecordsScript : MonoBehaviour
 
     void Start()
     {
+        //Путь к файлу с рекордами
         scoresFilePath = Application.dataPath + "/scores.txt";
         // Проверяем, существует ли файл
         if (!File.Exists(scoresFilePath))
@@ -19,6 +20,7 @@ public class SaveRecordsScript : MonoBehaviour
         }
     }
 
+    //Создание нового рекорда
     public void WriteNewScore(string playerName, int score)
     {
         // Получаем список всех рекордов из файла
@@ -40,13 +42,17 @@ public class SaveRecordsScript : MonoBehaviour
         WriteScoresToFile(scores);
     }
 
+    //Считывание рекорда с файла
     public List<ScoreData> ReadScoresFromFile()
     {
         List<ScoreData> scores = new List<ScoreData>();
+        //Путь к файлу с рекордами
         scoresFilePath = Application.dataPath + "/scores.txt";
 
+        // Читаем все строки из файла и сохраняем их в массив строк
         string[] lines = File.ReadAllLines(scoresFilePath);
 
+        //Цикл разделения строк на данные и добавление каждого рекорда с его данными в список
         foreach (string line in lines)
         {
             string[] data = line.Split(',');
@@ -59,13 +65,16 @@ public class SaveRecordsScript : MonoBehaviour
         return scores;
     }
 
+    //Добавление рекорда в файл
     void WriteScoresToFile(List<ScoreData> scores)
     {
         // Перезаписываем файл с рекордами
         File.WriteAllText(scoresFilePath, string.Empty);
-
+        
+        // Создаем StreamWriter для записи в файл
         using (StreamWriter writer = new StreamWriter(scoresFilePath, true))
         {
+            // Проходимся по каждому элементу в списке scores
             for (int i = 0; i < scores.Count; i++)
             {
                 // Записываем рекорд в файл

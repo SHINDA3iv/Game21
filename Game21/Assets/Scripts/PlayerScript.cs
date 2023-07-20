@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-    // --- This script is for BOTH player and dealer
+    //Скрипт игры для игрока и дилера
 
     // Get other scripts
     public CardScript cardScript;
@@ -26,63 +26,62 @@ public class PlayerScript : MonoBehaviour
     public void StartHand()
     {
         GetCard();
-        GetCard();
     }
 
-    // Add a hand to the player/dealer's hand
+    //Добавляет карту к комбинации карт игрока/дилера
     public int GetCard()
     {
-        // Get a card, use deal card to assign sprite and value to card on table
+        //назначение карты на раздачу
         int cardValue = deckScript.DealCard(hand[cardIndex].GetComponent<CardScript>());
-        // Show card on game screen
+        //Показывает карту на сцене
         hand[cardIndex].GetComponent<Renderer>().enabled = true;
-        // Add card value to running total of the hand
+        //Добавьте значение карты к общему значению раздачи
         handValue += cardValue;
-        // If value is 1, it is an ace
+        //Если значение равно 11, то это туз
         if (cardValue == 11)
         {
             aceList.Add(hand[cardIndex].GetComponent<CardScript>());
         }
-        // Check if we should use an 11 instead of a 1
+        //Проверка того, следует ли использовать 1 вместо 11
         AceCheck();
         cardIndex++;
         return handValue;
     }
 
-    // Search for needed ace conversions, 1 to 11 or vice versa
+    //Проверяет необходимое значение туза(1 или 11), и назначает его
     public void AceCheck()
     {
-        // for each ace in the list check
+        //Проверка каждого туза в списке
         foreach (CardScript ace in aceList)
         {
             if (handValue + 10 < 22 && ace.GetValueOfCard() == 1)
             {
-                // if converting, adjust card object value and hand
+                //Изменение значения туза и комбинации карт игрока/дилера
                 ace.SetValue(11);
                 handValue += 10;
             }
             else if (handValue > 21 && ace.GetValueOfCard() == 11)
             {
-                // if converting, adjust gameobject value and hand value
+                //Изменение значения туза и комбинации карт игрока/дилера
                 ace.SetValue(1);
                 handValue -= 10;
             }
         }
     }
 
-    // Add or subtract from money, for bets
+    //Измение суммы банка
     public void AdjustMoney(int amount)
     {
         money += amount;
     }
 
-    // Output players current money amount
+    //Вывод текущей суммы денег игроков
     public int GetMoney()
     {
         return money;
     }
 
-    // Hides all cards, resets the needed variables
+    //Скрывает все карты, сбрасывает необходимые переменные
     public void ResetHand()
     {
         for (int i = 0; i < hand.Length; i++)

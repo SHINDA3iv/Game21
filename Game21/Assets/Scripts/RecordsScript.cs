@@ -21,11 +21,13 @@ public class RecordsScript : MonoBehaviour
 
     private void Awake()
     {
+        //Идентифицирование обьектов на сцене для их дальнейшего клонирования
         entryContainer = transform.Find("highscoreEntryContainer");
         entryTemplate = entryContainer.Find("highscoreEntryTemplate");
 
         entryTemplate.gameObject.SetActive(false);
 
+        //Путь к файлу с рекордами
         scoresFilePath = Application.dataPath + "/scores.txt";
         // Проверяем, существует ли файл
         if (!File.Exists(scoresFilePath))
@@ -33,9 +35,10 @@ public class RecordsScript : MonoBehaviour
             // Если файл не существует, создаем его
             File.Create(scoresFilePath).Dispose();
         }
-
+        //Считывание рекордов с файла
         List<ScoreData> scores = SaveRecordsScript.ReadScoresFromFile();
-
+        
+        //Цикл добавления рекордов на сцену
         highscoreEntryTransformList = new List<Transform>();
         foreach (ScoreData scoreData in scores)
         {
@@ -45,12 +48,14 @@ public class RecordsScript : MonoBehaviour
 
     public void CreateHighscoreEntryTransform(ScoreData ScoreData, Transform container, List<Transform> trasformList)
     {
+        //Создание клонов обьектов и их размещение
         float templateHeight = 50f;
         Transform entryTransform = Instantiate(entryTemplate, container);
         RectTransform entryRectTransform = entryTransform.GetComponent<RectTransform>();
         entryRectTransform.anchoredPosition = new Vector2(0, -templateHeight * trasformList.Count);
         entryTransform.gameObject.SetActive(true);
 
+        //Отображение текста рекордов, их места и того, кто набрал данный рекорд
         int rank = trasformList.Count + 1;
         string rankString;
 
@@ -68,6 +73,7 @@ public class RecordsScript : MonoBehaviour
         string name = ScoreData.playerName;
         entryTransform.Find("nameText").GetComponent<Text>().text = name.ToString();
 
+        //Отображение текста зеленым цветом у первого места
         if (rank == 1)
         {
             entryTransform.Find("posText").GetComponent<Text>().color = Color.green;
@@ -75,11 +81,13 @@ public class RecordsScript : MonoBehaviour
             entryTransform.Find("nameText").GetComponent<Text>().color = Color.green;
         }
 
+        //Удаление фона у каждого второго места для улучшения видимости
         if (rank % 2 != 1)
         {
             entryTransform.Find("background").gameObject.SetActive(false);
         }
 
+        //Отображение изображения кубка и его цвета в зависимости от места
         switch (rank)
         {
             default:
@@ -96,9 +104,7 @@ public class RecordsScript : MonoBehaviour
                 break;
         }
 
+        //Добавление обьекто в список
         trasformList.Add(entryTransform);
     }
-
 }
-
-
