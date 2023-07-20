@@ -37,7 +37,6 @@ public class GameManager : MonoBehaviour
     // Card hiding dealer's 2nd card
     public GameObject hideCard;
     public GameObject popupMenu;
-    public GameObject HidePanel;
     public GameObject Deck;
     // How much is bet
     int pot = 0;
@@ -61,10 +60,12 @@ public class GameManager : MonoBehaviour
         dealButton.gameObject.SetActive(false);
         repeatButton.gameObject.SetActive(false);
         dealerScoreText.gameObject.SetActive(false);
+        scoreText.gameObject.SetActive(false);
         hideCard.gameObject.SetActive(false);
         popupMenu.gameObject.SetActive(false);
-        HidePanel.gameObject.SetActive(false);
         gameoverButton.gameObject.SetActive(false);
+
+        mainText.text = "Сделайте ставку";
 
         playerScript.ResetHand();
         dealerScript.ResetHand();
@@ -73,7 +74,8 @@ public class GameManager : MonoBehaviour
     private void DealClicked()
     {
         // Hide deal hand score at start of deal
-        dealerScoreText.gameObject.SetActive(false);
+        //dealerScoreText.gameObject.SetActive(false);
+        scoreText.gameObject.SetActive(true);
         mainText.gameObject.SetActive(false);
         //dealerScoreText.gameObject.SetActive(false);
         hideCard.gameObject.SetActive(true);
@@ -223,8 +225,7 @@ public class GameManager : MonoBehaviour
     void GameOver()
     {
         gameoverButton.gameObject.SetActive(true);
-        if (playerScript.GetMoney() == 0) mainText.text = "У вас кончились деньги!";
-        else if (dealerScript.GetMoney() == 0) mainText.text = "У дилера кончились деньги!";
+        if (playerScript.GetMoney() == 0 && dealerScript.GetMoney() == 0) mainText.text = "Деньги кончились!";
     }
 
     // Add money to pot if bet clicked
@@ -232,6 +233,8 @@ public class GameManager : MonoBehaviour
     {
         Text newBet = bet.GetComponentInChildren(typeof(Text)) as Text;
         int intBet = int.Parse(newBet.text.ToString());
+        mainText.gameObject.SetActive(false);
+
         if (playerScript.GetMoney() >= intBet && dealerScript.GetMoney() >= intBet)
         {
             dealButton.gameObject.SetActive(true);
@@ -254,7 +257,6 @@ public class GameManager : MonoBehaviour
     {
         popupMenu.gameObject.SetActive(true);
         popupMenuButton.gameObject.SetActive(false);
-        HidePanel.gameObject.SetActive(true);
         dealButton.interactable = false;
         repeatButton.interactable = false;
         hitButton.interactable = false;
@@ -263,29 +265,12 @@ public class GameManager : MonoBehaviour
         bet100Button.interactable = false;
         bet250Button.interactable = false;
         bet500Button.interactable = false;
-
-        for (int i = 0; i < playerScript.hand.Length; i++)
-        {
-            var rendererPlayer = playerScript.hand[i].GetComponent<Renderer>();
-            rendererPlayer.material.color *= 0.5f;
-        }
-        for (int i = 0; i < dealerScript.hand.Length; i++)
-        {
-            var rendererDealer = dealerScript.hand[i].GetComponent<Renderer>();
-            rendererDealer.material.color *= 0.5f;
-        }
-        if (hideCard.activeSelf) dealerScript.hand[0].GetComponent<Renderer>().gameObject.SetActive(false);
-        var rendererHide = hideCard.GetComponent<Renderer>();
-        var rendererDeck = Deck.GetComponent<Renderer>();
-        rendererHide.material.color *= 0.5f;
-        rendererDeck.material.color *= 0.5f;
     }
 
     public void BackClicked()
     {
         popupMenu.gameObject.SetActive(false);
         popupMenuButton.gameObject.SetActive(true);
-        HidePanel.gameObject.SetActive(false);
         dealButton.interactable = true;
         repeatButton.interactable = true;
         hitButton.interactable = true;
@@ -294,22 +279,6 @@ public class GameManager : MonoBehaviour
         bet100Button.interactable = true;
         bet250Button.interactable = true;
         bet500Button.interactable = true;
-
-        for (int i = 0; i < playerScript.hand.Length; i++)
-        {
-            var rendererPlayer = playerScript.hand[i].GetComponent<Renderer>();
-            rendererPlayer.material.color *= 2f;
-        }
-        for (int i = 0; i < dealerScript.hand.Length; i++)
-        {
-            var rendererDealer = dealerScript.hand[i].GetComponent<Renderer>();
-            rendererDealer.material.color *= 2f;
-        }
-        dealerScript.hand[0].GetComponent<Renderer>().gameObject.SetActive(true);
-        var rendererHide = hideCard.GetComponent<Renderer>();
-        var rendererDeck = Deck.GetComponent<Renderer>();
-        rendererHide.material.color *= 2f;
-        rendererDeck.material.color *= 2f;
     }
 
     public void MenuClicked()
