@@ -47,7 +47,7 @@ public class PlayerScript : MonoBehaviour
         cardIndex++;
         return handValue;
     }
-
+    
     //Проверяет необходимое значение туза(1 или 11), и назначает его
     public void AceCheck()
     {
@@ -67,6 +67,18 @@ public class PlayerScript : MonoBehaviour
                 handValue -= 10;
             }
         }
+    }
+
+    //Количество эйсов на руке игрока
+    public int AceCount()
+    {
+        return aceList.Count;
+    }
+
+    //Количество карт на руке игрока
+    public int CardCount()
+    {
+        return cardIndex;
     }
 
     //Измение суммы банка

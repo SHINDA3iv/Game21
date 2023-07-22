@@ -130,7 +130,8 @@ public class GameManager : MonoBehaviour
         {
             playerScript.GetCard();
             scoreText.text = "Ваш счет: " + playerScript.handValue.ToString();
-            if (playerScript.handValue > 20) RoundOver();
+            if (playerScript.CardCount() == playerScript.AceCount() && playerScript.CardCount() == 2) RoundOver();
+            else if (playerScript.handValue > 20) RoundOver();
         }
     }
 
@@ -153,7 +154,12 @@ public class GameManager : MonoBehaviour
         {
             dealerScript.GetCard();
             dealerScoreText.text = "Счет дилера: " + dealerScript.handValue.ToString();
-            if (dealerScript.handValue > 20) RoundOver();
+            if (dealerScript.CardCount() == dealerScript.AceCount() && dealerScript.CardCount() == 2)
+            { 
+                RoundOver();
+                break;
+            }
+            else if (dealerScript.handValue > 20) RoundOver();
         }
     }
 
@@ -165,9 +171,11 @@ public class GameManager : MonoBehaviour
         bool dealerBust = dealerScript.handValue > 21;
         bool player21 = playerScript.handValue == 21;
         bool dealer21 = dealerScript.handValue == 21;
+        bool player2ace = (dealerScript.CardCount() == dealerScript.AceCount() && dealerScript.CardCount() == 2);
+        bool dealer2ace = (dealerScript.CardCount() == dealerScript.AceCount() && dealerScript.CardCount() == 2);
 
         //Если кнопка Stand была нажата менее двух раз, нет переборов или 21, завершите работу функции
-        if (standClicks < 2 && !playerBust && !dealerBust && !player21 && !dealer21) return;
+        if (standClicks < 2 && !playerBust && !dealerBust && !player21 && !dealer21 && !player2ace && !dealer2ace) return;
         bool roundOver = true;
 
         //У всех перебор, возврат ставок
@@ -176,6 +184,18 @@ public class GameManager : MonoBehaviour
             mainText.text = "У всех перебор!";
             playerScript.AdjustMoney(pot / 2);
             dealerScript.AdjustMoney(pot / 2);
+        }
+        //У игрока золотое очко, его победа
+        else if (player2ace)
+        {
+            mainText.text = "Золотое очко!";
+            playerScript.AdjustMoney(pot);
+        }
+        //У игрока золотое очко, его победа
+        else if (dealer2ace)
+        {
+            mainText.text = "Золотое очко!";
+            dealerScript.AdjustMoney(pot);
         }
         //Если только у игрока перебор или у дилера больше очков, дилер выигрывает
         else if (playerBust || (!dealerBust && dealerScript.handValue > playerScript.handValue))
@@ -186,7 +206,7 @@ public class GameManager : MonoBehaviour
         //Если только у дилера перебор или у игрока больше очков, игрок выигрывает
         else if (dealerBust || playerScript.handValue > dealerScript.handValue)
         {
-            mainText.text = "ВЫ победили!";
+            mainText.text = "Вы победили!";
             playerScript.AdjustMoney(pot);
         }
         //Проверка на ничью, возврат ставок
