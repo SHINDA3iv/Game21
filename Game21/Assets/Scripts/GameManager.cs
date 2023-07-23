@@ -1,10 +1,5 @@
-using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManager : MonoBehaviour
 {   
@@ -150,7 +145,7 @@ public class GameManager : MonoBehaviour
     private void HitDealer()
     {
         //Проверка оставшегося места для карт у игрока, а также на значение карт меньше 17 и  меньше чем у игрока
-        while (dealerScript.handValue < 17 && dealerScript.cardIndex < 10 && dealerScript.handValue <= playerScript.handValue)
+        while (dealerScript.handValue < 17 && dealerScript.cardIndex < 10)
         {
             dealerScript.GetCard();
             dealerScoreText.text = "Счет дилера: " + dealerScript.handValue.ToString();
@@ -254,8 +249,6 @@ public class GameManager : MonoBehaviour
     //Добавление денег в банк при нажатии кнопки bet
     void BetClicked(Button bet)
     {
-        mainText.gameObject.SetActive(false);
-
         Text newBet = bet.GetComponentInChildren(typeof(Text)) as Text;
         int intBet = int.Parse(newBet.text.ToString());
 

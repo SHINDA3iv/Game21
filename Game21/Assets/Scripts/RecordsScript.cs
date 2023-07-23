@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 
 
 public class RecordsScript : MonoBehaviour
